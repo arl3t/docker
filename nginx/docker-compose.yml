@@ -1,0 +1,80 @@
+version: "2.4"
+
+services:
+  # Proxy reverso nginx + HTTPS con Let's Encrypt (obligatorio)
+  proxy:
+    image: linuxserver/swag
+    container_name: proxy
+    environment:
+      - PUID=1000
+      - PGID=1000
+      
+      # Configuracion de Let's Encrypt
+      - URL=lgroots.xyz
+      - VALIDATION=http
+      - SUBDOMAINS=portainer,openvpn,www
+      - EMAIL=rinsfran@legacy-roots.net
+      - DHLEVEL=4096
+    ports:
+      # Solo el proxy tiene puertos expuestos,
+      # los demas contenedores salen por aqui.
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "proxyconfig:/config"
+    networks:
+      # La comunicacion con los contenedores es por
+      # redes individuales, para proporcionar aislamiento
+      - portainer-net
+      - website-net
+    restart: always
+
+
+  # Gestor de contenedores via interfaz web (recomendado)
+  portainer:
+    image: portainer/portainer
+    container_name: portainer
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "portainerdata:/data"
+    networks:
+      - portainer-net
+    restart: always
+
+  # Defina aqui los servicios adicionales
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    # For DHCP it is recommended to remove these ports and instead add: network_mode: "host"
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+    #  - "67:67/udp" # Only required if you are using Pi-hole as your DHCP server
+      - "81:80/tcp"
+    environment:
+      TZ: 'America/Asuncion'
+      # WEBPASSWORD: 'set a secure password here or it will be random'
+    # Volumes store your data between container upgrades
+    volumes:
+      - './etc-pihole:/etc/pihole'
+      - './etc-dnsmasq.d:/etc/dnsmasq.d'
+    #   https://github.com/pi-hole/docker-pi-hole#note-on-capabilities
+    cap_add:
+      - NET_ADMIN # Required if you are using Pi-hole as your DHCP server, else not needed  
+    networks:
+      website-net:
+        ipv4_address: 172.20.0.53
+    restart: unless-stopped
+
+# Redes y volumenes utilizados por los servicios
+volumes:
+  proxyconfig:
+  portainerdata:
+
+networks:
+  portainer-net:
+  website-net:
+    ipam: 
+      config:
+        - subnet: 172.20.0.0/16
+      

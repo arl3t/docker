@@ -1,0 +1,19 @@
+#Directorio raiz
+docker run -v /dbdata --name dbstore ubuntu /bin/bash
+docker run --rm --volumes-from dbstore -v $(pwd):/backup ubuntu tar cvf /backup/backup.tar dbdata
+
+# montar el backup en el contener dbstore
+docker run --rm --volumes-from dbstore -v $(pwd):/backup ubuntu tar cvf /backup/backup.tar /dbdata
+
+
+#Restaurar, crear el directorio script docker-vackup
+https://github.com/BretFisher/docker-vackup.git
+
+# Incluir el ejecutable en bin para ejecutar en consola
+curl -sSL https://raw.githubusercontent.com/BretFisher/docker-vackup/main/vackup > /usr/local/bin/vackup
+chmod +x /usr/local/bin/vackup
+# Realizar el backup
+vackup export mivolumen mivolument.tar.gz
+
+#Extraer
+vackup import portainer_data.tar.gz portainer_data

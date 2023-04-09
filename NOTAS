@@ -1,0 +1,38 @@
+# NETWORK#########################
+version: '2'
+services:
+  webserver:
+    image: nginx
+    container_name: web-server
+    networks:
+      nginx_default:
+        ipv4_address: 172.18.0.10
+networks:
+  nginx_default:
+    ipam:
+      config:
+        - subnet: 172.18.0.0/16
+##################################
+
+
+#Comando RSYNC
+rsync -avP appdata root@5.22.219.83:/root/nginx/
+# Comando agregar usuario al grupo root
+sudo useradd -u 0 -o -g 0 newuser
+
+
+#Manejar volumenes##############
+networks:
+      red_interna:
+        ipv4_address: 192.168.20.20
+    hostname: servidor_mariadb
+networks:
+    red_web:
+        ipam:
+            config:
+              - subnet: 192.168.10.0/24
+    red_interna:
+        ipam:
+            config:
+              - subnet: 192.168.20.0/24
+################################
