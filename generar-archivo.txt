@@ -1,0 +1,25 @@
+#Configuracion del SSH
+/etc/ssh/sshd 
+PubkeyAuthentication yes
+
+
+
+
+#En el servidor generar la llaves publicas y privadas
+
+ssh-keygen -b 2048 -t rsa
+
+ssh-copy-id -i ~/.ssh/mykey user@host
+
+puttygen .ssh/id_rsa -o /home/nodo1/test.ppk
+
+puttygen ppk_file.ppk -O private-openssh-new -o pem_file.pem
+
+#####
+#Generar cifrado edwar
+ssh-keygen -t ed25519
+#Copiar
+ssh-copy-id lab@181.94.246.141
+##############
+#sudo no pass
+NOPASSWD:ALL
