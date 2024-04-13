@@ -9,7 +9,7 @@ PubkeyAuthentication yes
 
 ssh-keygen -b 2048 -t rsa
 
-ssh-copy-id -i ~/.ssh/mykey user@host
+ssh-copy-id -i ~/.ssh/id_rsa user@host
 
 puttygen .ssh/id_rsa -o /home/nodo1/test.ppk
 
